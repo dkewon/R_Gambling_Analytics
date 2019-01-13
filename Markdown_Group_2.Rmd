@@ -1,0 +1,150 @@
+---
+title: "Group2- Gambling Marketing Statistics"
+author: "James Ponce, Remo Boesiger and Deborah Kewon"
+date: "13 December 2018"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R Markdown
+```{r basetable, echo=FALSE}
+basetable_r <- read.csv("C:\\Users\\dkewon\\Documents\\GitHub\\group-assignment-open-source-programming-bwin-group-2\\basetable_rmark.csv")
+
+profitlang_r <- read.csv("C:\\Users\\dkewon\\Documents\\GitHub\\group-assignment-open-source-programming-bwin-group-2\\profitlang_rmark.csv")
+profitlang <- subset(profitlang_r, select = -c(1, 3,4))
+
+profitlang_r <- read.csv("C:\\Users\\dkewon\\Documents\\GitHub\\group-assignment-open-source-programming-bwin-group-2\\profitlang_rmark.csv")
+ethnic <- subset(profitlang_r, select = -c(1, 3,5))
+
+```
+<font size="4">
+<br />
+
+###**Intro**
+
+The purpose of this report is to describe the activities of gamblers between February and October, 2005. In order to create data mart, we used the following datasets 1. Demographics 2. UserDaily Aggregation and 3. PokerChipConversions. This data mart contains variables such as demographics, wins and losses for different stakes,recency, frequency and monetary value (RFM), and last playdays. The total observations and variables of this data mart are 42,649 and 46 respectively. 
+
+<font size="4">
+
+<br />
+
+### **1. Demographics**
+
+####a. Gender
+
+```{r gender ratio, echo=FALSE}
+library(ggplot2)
+temp = basetable_r[!is.na(basetable_r$Gender),]
+temp$Gender = ifelse(temp$Gender == 1,"Male","Female")
+ggplot(temp,aes(x=Gender)) +
+  geom_bar(aes(y=..count..))
+```
+<br />According to this bar graph, 92% of gamblers are men.
+<br />
+<br />
+
+####b.Language
+```{r language ratio, echo=FALSE}
+options(repos=structure(c(CRAN="https://cran.cnr.berkeley.edu/")))
+library(ggplot2)
+
+
+ethnic
+
+ggplot(ethnic, aes(x = as.character(Language_Description), y = diversity)) + geom_bar(stat="identity") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + labs(y = "Number", x= "Language Description")
+```
+
+<br />As shown above,most gamblers are German speakers.While German gambling participiration rate is as high as 61%, Dutch and Russian gambling participation is almost 0% (1 out of 42,649 played for both cases). 
+
+<br />
+<br />
+
+###**2. Popular Gambling Websites**
+
+```{r game popularity, echo=FALSE, message=FALSE}
+library(epiDisplay)
+tab1(basetable_r$Application_Description, sort.group = "decreasing", cum.percent = TRUE, main = "Popularity of Different Gambling Websites")
+```
+
+<br />The most popular gambling website is BETANDWIN.DE (51.7%).
+
+<br />
+
+###**3. Profit and Loss**
+####a. Profit and loss by different language groups
+```{r average loss, echo=FALSE}
+
+print(profitlang)
+
+library(ggplot2)
+
+ggplot(profitlang_r, aes(x = as.character(Language_Description), y = profit_per_player_lang)) + geom_bar(stat="identity") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + labs(y = "amount of loss", x='Language')+
+  geom_abline(intercept = 0,colour = 2)
+
+```
+
+<br />This histogram well displays the low chance of winning in gambling. The average losses of the 66 Portuguese gamblers was with over $800 the highest around all language groups. Only Dutch and Russian gamblers managed to win. However, considering the fact that there was only 1 gambler in each group, it is hard to say that a certain group is more likely to win.
+
+<br />
+
+####b. Profit by Game
+
+```{r profit by game, echo=FALSE}
+library(ggplot2)
+result_1 <- sum(basetable_r$stakes_1) - sum(basetable_r$wins_1)
+result_2 <- sum(basetable_r$stakes_2) - sum(basetable_r$wins_2)
+result_3 <- 0
+result_4 <- sum(basetable_r$stakes_4) - sum(basetable_r$wins_4)
+result_5 <- sum(basetable_r$stakes_5) - sum(basetable_r$wins_5)
+result_6 <- sum(basetable_r$stakes_6) - sum(basetable_r$wins_6)
+result_7 <- sum(basetable_r$stakes_7) - sum(basetable_r$wins_7)
+result_8 <- sum(basetable_r$stakes_8) - sum(basetable_r$wins_8)
+game_results <- c(1,result_1, 2,result_2, 3,result_3,4, result_4, 5,result_5,6, result_6,7, result_7,8, result_8)
+
+results_data <- matrix(game_results, ncol=2, byrow=TRUE)
+results_data2 <- as.data.frame(results_data, stringsAsFactors=FALSE)
+library(ggplot2)
+ggplot(results_data2, aes(x = V1, y = V2)) + geom_bar(stat="identity") +
+ labs(y = "Profit", x='Type of Games')+scale_x_continuous(breaks = seq(0, 8, 1))
+```
+
+<br /> Game 3 does not have any data in the present period. 
+<br /> The most profitable game for the betting company is game 1 followed by game 2.
+<br /> The least profitable game for the betting company is game 5.
+<br />
+<br />Game 1- Sports book fixed-odd
+<br />Game 2- Sports book live-action
+<br />Game 3- Poker BossMedia
+<br />Game 4- Casino BossMedia
+<br />Game 5- Supertoto
+<br />Game 6- Games VS
+<br />Game 7-Games bwin
+<br />Game 8-Casino Chartwell
+
+<br />
+
+###**4. Number of Gambling days**
+
+```{r gambling days, echo=FALSE}
+boxplot(basetable_r$days_played)
+```
+<br />On average, people played around 20 days during this time.75% of players gambled fewer than 50 days, and most people played 100 days or less. However, there are also 6.5% of the population who played on more than 100 different days; those are represented by the straight line (dots close to each other) above the boxplot.
+<br />
+
+###**5. Last Gambling Dates**
+<br />
+```{r last gambling date, echo=FALSE}
+plot(basetable_r$last_play_date)
+```
+<br />While most gamblers had their last play days in September, there are also a few gambers who had their last play days in the month of registration. 
+
+<br />
+<br />
