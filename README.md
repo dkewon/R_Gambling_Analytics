@@ -15,6 +15,8 @@ The total observations and variables of this data mart are 42,649 and 46 respect
      -It is a R shiny script 
      
 **The report can be found on [Rpubs](http://rpubs.com/dkewon/450216)**
+
+
 **The r shiny application can be found on [here](https://jamesponce.shinyapps.io/Gamblers_Behaviour/)**
 
 
